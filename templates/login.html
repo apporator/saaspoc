@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Login - Integration POC{% endblock %}
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-purple-900">
+    <div class="bg-white p-8 rounded-lg shadow-2xl w-96">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Integration POC</h1>
+            <p class="text-gray-500 mt-2">End-to-End Demo Platform</p>
+        </div>
+        
+        {% if error %}
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {{ error }}
+        </div>
+        {% endif %}
+        
+        <form method="POST" action="/login">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="username">Username</label>
+                <input type="text" name="username" id="username" required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter username">
+            </div>
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Password</label>
+                <input type="password" name="password" id="password" required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter password">
+            </div>
+            <button type="submit"
+                class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 font-semibold">
+                Sign In
+            </button>
+        </form>
+        
+        <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+            <p class="text-sm text-gray-600 font-semibold mb-2">Demo Credentials:</p>
+            <div class="text-xs text-gray-500 space-y-1">
+                <p><span class="font-medium">Admin:</span> admin / admin123</p>
+                <p><span class="font-medium">Viewer:</span> viewer / viewer123</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

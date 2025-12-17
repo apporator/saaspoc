@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Weather Data - Integration POC{% endblock %}
+{% block content %}
+<div class="flex">
+    <nav class="sidebar w-64 bg-gray-800 min-h-screen p-4 fixed">
+        <div class="text-white mb-8">
+            <h1 class="text-xl font-bold">Integration POC</h1>
+            <p class="text-gray-400 text-sm mt-1">{{ user.name }} ({{ user.role }})</p>
+        </div>
+        <ul class="space-y-2">
+            <li><a href="/dashboard" class="block text-gray-300 hover:text-white hover:bg-gray-700 px-4 py-2 rounded">Dashboard</a></li>
+            <li><a href="/orders" class="block text-gray-300 hover:text-white hover:bg-gray-700 px-4 py-2 rounded">Orders</a></li>
+            <li><a href="/stripe" class="block text-gray-300 hover:text-white hover:bg-gray-700 px-4 py-2 rounded">Stripe Payments</a></li>
+            <li><a href="/github" class="block text-gray-300 hover:text-white hover:bg-gray-700 px-4 py-2 rounded">GitHub Issues</a></li>
+            <li><a href="/weather" class="block text-white bg-orange-600 px-4 py-2 rounded">Weather Data</a></li>
+        </ul>
+        <div class="absolute bottom-4 left-4">
+            <a href="/logout" class="text-gray-400 hover:text-white text-sm">Logout</a>
+        </div>
+    </nav>
+
+    <main class="ml-64 flex-1 p-8">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">Weather Telemetry</h2>
+                <p class="text-gray-500">Weather data from OpenWeather API</p>
+            </div>
+            {% if user.role == 'admin' %}
+            <button onclick="syncData('weather')" class="sync-btn bg-orange-500 text-white px-6 py-2 rounded hover:bg-orange-600">
+                Sync Weather
+            </button>
+            {% endif %}
+        </div>
+
+        <div class="grid grid-cols-2 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow">
+                <p class="text-gray-500 text-sm">Cities Tracked</p>
+                <p class="text-3xl font-bold text-orange-600">{{ cities_count }}</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <p class="text-gray-500 text-sm">Avg Temperature</p>
+                <p class="text-3xl font-bold text-blue-600">{{ avg_temp }}C</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for w in weather %}
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">{{ w.city }}</h3>
+                    <span class="text-3xl">
+                        {% if 'clear' in w.description %}&#9728;
+                        {% elif 'cloud' in w.description %}&#9729;
+                        {% elif 'rain' in w.description %}&#127783;
+                        {% elif 'sun' in w.description %}&#9728;
+                        {% else %}&#127781;{% endif %}
+                    </span>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Temperature</span>
+                        <span class="font-semibold">{{ w.temperature }}C</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Feels Like</span>
+                        <span class="font-semibold">{{ w.feels_like }}C</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Humidity</span>
+                        <span class="font-semibold">{{ w.humidity }}%</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Wind Speed</span>
+                        <span class="font-semibold">{{ w.wind_speed }} m/s</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Conditions</span>
+                        <span class="font-semibold capitalize">{{ w.description }}</span>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-400 mt-4">Recorded: {{ w.recorded_at.strftime('%Y-%m-%d %H:%M') }}</p>
+            </div>
+            {% else %}
+            <div class="col-span-3 bg-white p-12 rounded-lg shadow text-center text-gray-500">
+                No weather data found. Click "Sync Weather" to fetch data from OpenWeather API.
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+</div>
+{% endblock %}

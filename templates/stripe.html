@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Stripe Payments - Integration POC{% endblock %}
+{% block content %}
+<div class="flex">
+    <nav class="sidebar w-64 bg-gray-800 min-h-screen p-4 fixed">
+        <div class="text-white mb-8">
+            <h1 class="text-xl font-bold">Integration POC</h1>
+            <p class="text-gray-400 text-sm mt-1">{{ user.name }} ({{ user.role }})</p>
+        </div>
+        <ul class="space-y-2">
+            <li><a href="/dashboard" class="block text-gray-300 hover:text-white hover:bg-gray-700 px-4 py-2 rounded">Dashboard</a></li>
+            <li><a href="/orders" class="block text-gray-300 hover:text-white hover:bg-gray-700 px-4 py-2 rounded">Orders</a></li>
+            <li><a href="/stripe" class="block text-white bg-purple-600 px-4 py-2 rounded">Stripe Payments</a></li>
+            <li><a href="/github" class="block text-gray-300 hover:text-white hover:bg-gray-700 px-4 py-2 rounded">GitHub Issues</a></li>
+            <li><a href="/weather" class="block text-gray-300 hover:text-white hover:bg-gray-700 px-4 py-2 rounded">Weather Data</a></li>
+        </ul>
+        <div class="absolute bottom-4 left-4">
+            <a href="/logout" class="text-gray-400 hover:text-white text-sm">Logout</a>
+        </div>
+    </nav>
+
+    <main class="ml-64 flex-1 p-8">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">Stripe Payments</h2>
+                <p class="text-gray-500">Payment transaction data from Stripe API</p>
+            </div>
+            {% if user.role == 'admin' %}
+            <button onclick="syncData('stripe')" class="sync-btn bg-purple-500 text-white px-6 py-2 rounded hover:bg-purple-600">
+                Sync Payments
+            </button>
+            {% endif %}
+        </div>
+
+        <div class="grid grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow">
+                <p class="text-gray-500 text-sm">Total Volume</p>
+                <p class="text-3xl font-bold text-purple-600">${{ total_amount }}</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <p class="text-gray-500 text-sm">Succeeded</p>
+                <p class="text-3xl font-bold text-green-600">{{ succeeded_count }}</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <p class="text-gray-500 text-sm">Pending</p>
+                <p class="text-3xl font-bold text-yellow-600">{{ pending_count }}</p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow">
+            <table class="w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Payment ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for payment in payments %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-sm font-mono text-gray-900">{{ payment.payment_id[:20] }}...</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ payment.customer_email }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">${{ "%.2f"|format(payment.amount) }} {{ payment.currency }}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-xs rounded-full 
+                                {% if payment.status == 'succeeded' %}bg-green-100 text-green-800
+                                {% elif payment.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                {% else %}bg-red-100 text-red-800{% endif %}">
+                                {{ payment.status }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-500">{{ payment.description[:30] }}...</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                            No payments found. Click "Sync Payments" to fetch data from Stripe.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+{% endblock %}
