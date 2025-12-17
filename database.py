@@ -4,12 +4,16 @@ from sqlalchemy.orm import sessionmaker, DeclarativeBase
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
-# Fallback for Render free tier / local dev
 if not DATABASE_URL:
     DATABASE_URL = "sqlite:///./demo.db"
     connect_args = {"check_same_thread": False}
 else:
     connect_args = {}
+
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace(
+        "postgres://", "postgresql+psycopg2://", 1
+    )
 
 engine = create_engine(
     DATABASE_URL,
